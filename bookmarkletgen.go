@@ -13,7 +13,7 @@ import (
 )
 
 type fileMetadata struct {
-	title, description string
+	title, description, image string
 }
 
 type minifiedJS struct {
@@ -24,12 +24,15 @@ type minifiedJS struct {
 func findFileMetadata(f, js string) fileMetadata {
 	var title string
 	var descr string
+	var image string
 	lines := strings.Split(js, "\n")
 	for _, s := range lines {
 		if m := titleRE.FindStringSubmatch(s); m != nil && len(m) == 2 {
 			title = strings.TrimSpace(m[1])
 		} else if m := descrRE.FindStringSubmatch(s); m != nil && len(m) == 2 {
 			descr = strings.TrimSpace(m[1])
+		} else if m := imageRE.FindStringSubmatch(s); m != nil && len(m) == 2 {
+			image = strings.TrimSpace(m[1])
 		}
 	}
 	if title == "" {
@@ -38,6 +41,7 @@ func findFileMetadata(f, js string) fileMetadata {
 	res := fileMetadata{
 		title:       title,
 		description: descr,
+		image:       image,
 	}
 	return res
 }
@@ -66,6 +70,7 @@ func minifyAndFindFileMetadata(f string) (*minifiedJS, error) {
 var (
 	titleRE = regexp.MustCompile(`.*@Title:(.*)$`)
 	descrRE = regexp.MustCompile(`.*@Description:(.*)$`)
+	imageRE = regexp.MustCompile(`.*@Image:(.*)$`)
 )
 
 func titleFromFileName(f string) string {
@@ -93,9 +98,11 @@ func inspectFiles(jsFiles []string, baseSourceURL string) ([]titledJS, error) {
 		link := fmt.Sprintf(baseSourceURL+"/%s", path.Base(f))
 		title := minified.md.title
 		descr := minified.md.description
+		image := minified.md.image
 		t := titledJS{
 			Title:       title,
 			Description: descr,
+			Image:       image,
 			JS:          js,
 			Link:        link,
 		}

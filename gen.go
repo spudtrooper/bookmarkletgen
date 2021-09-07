@@ -16,7 +16,12 @@ func genIndexHTML(titledJSs []titledJS) ([]byte, error) {
 	<p>
 		<ul>
 		{{range $index, $p := .TitledJSs}}
-				<li><a href="javascript:{{$p.JS}}">{{$p.Title}}</a> (<a target="_" href="{{$p.Link}}">src</a>) - {{$p.Description}}</li>
+				<li>
+					<a href="javascript:{{$p.JS}}">{{$p.Title}}</a> (<a target="_" href="{{$p.Link}}">src</a>) - {{$p.Description}}
+					{{if $p.Image }}
+						[<a target="_" href="{{$p.Image}}">Context</a>]
+					{{end}}
+				</li>
 		{{end}}
 		</ul>
 	</p>

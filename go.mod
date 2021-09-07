@@ -1,6 +1,10 @@
-module "github.com/spudtrooper/bookmarkletgen"
+module github.com/spudtrooper/bookmarkletgen
 
-go 1.15
+go 1.17
 
-require github.com/tdewolff/minify
-require github.com/tdewolff/minify/js
+require github.com/tdewolff/minify v2.3.6+incompatible
+
+require (
+	github.com/tdewolff/parse v2.3.4+incompatible // indirect
+	github.com/tdewolff/test v1.0.6 // indirect
+)
