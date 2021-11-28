@@ -1,6 +1,6 @@
 package bookmarkletgen
 
-// ~/go/bin/genopts  outfileHTML:string outfileMD:string baseSourceURL:string footerHTML:string
+// genopts --outfile=bookmarkletgen/options.go 'outfileHTML:string' 'outfileMD:string' 'baseSourceURL:string' 'footerHTML:string'
 
 type Option func(*optionImpl)
 
@@ -47,10 +47,14 @@ func (o *optionImpl) OutfileMD() string     { return o.outfileMD }
 func (o *optionImpl) BaseSourceURL() string { return o.baseSourceURL }
 func (o *optionImpl) FooterHTML() string    { return o.footerHTML }
 
-func makeOptionImpl(opts ...Option) optionImpl {
-	var res optionImpl
+func makeOptionImpl(opts ...Option) *optionImpl {
+	res := &optionImpl{}
 	for _, opt := range opts {
-		opt(&res)
+		opt(res)
 	}
 	return res
+}
+
+func MakeOptions(opts ...Option) Options {
+	return makeOptionImpl(opts...)
 }
