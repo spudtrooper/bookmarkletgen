@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"sort"
+
+	"github.com/yosssi/gohtml"
 )
 
 // GenerateIndexFiles generates bookmarklet index files for the given JS files.
@@ -25,7 +27,8 @@ func GenerateIndexFiles(jsFiles []string, os ...Option) error {
 			return err
 		}
 		log.Printf("Writing to %s\n", opts.outfileHTML)
-		if err := ioutil.WriteFile(opts.outfileHTML, out, 0755); err != nil {
+		formatted := gohtml.Format(string(out))
+		if err := ioutil.WriteFile(opts.outfileHTML, []byte(formatted), 0755); err != nil {
 			return err
 		}
 	}
