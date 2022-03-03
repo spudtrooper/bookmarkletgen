@@ -10,6 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spudtrooper/bookmarkletgen/bookmarkletgen"
+	"github.com/spudtrooper/bookmarkletgen/gitversion"
 )
 
 var (
@@ -26,6 +27,9 @@ var (
 )
 
 func generateIndex() error {
+	if gitversion.CheckVersionFlag() {
+		return nil
+	}
 	if *jsDir == "" {
 		return fmt.Errorf("js_dir required")
 	}
