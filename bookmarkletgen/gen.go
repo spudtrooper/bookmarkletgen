@@ -5,11 +5,18 @@ import (
 	"text/template"
 )
 
-func genIndexHTML(titledJSs []titledJS, footerHTML string) ([]byte, error) {
-	t := `
+func genIndexHTML(titledJSs []titledJS, footerHTML, headerHTML, templateHTML string) ([]byte, error) {
+	t := templateHTML
+	if t == "" {
+		t = `
 	<html>
 	<body>	
 		<h1>Bookmarklets</h1>
+		{{if .Header}}
+		<p>
+			{{.Header}}
+		</p>
+		{{end}}
 		<p>
 			To install, drag the links not titled 'src' to your toolbar.
 		</p>
@@ -33,6 +40,7 @@ func genIndexHTML(titledJSs []titledJS, footerHTML string) ([]byte, error) {
 	</body>
 	</html>
 			`
+	}
 	tmpl, err := template.New("html").Parse(t)
 	if err != nil {
 		return nil, err
@@ -40,9 +48,11 @@ func genIndexHTML(titledJSs []titledJS, footerHTML string) ([]byte, error) {
 	var data = struct {
 		TitledJSs []titledJS
 		Footer    string
+		Header    string
 	}{
 		TitledJSs: titledJSs,
 		Footer:    footerHTML,
+		Header:    headerHTML,
 	}
 	var out bytes.Buffer
 	if err = tmpl.Execute(&out, data); err != nil {

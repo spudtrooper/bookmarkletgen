@@ -18,6 +18,6 @@ args=(
     --footer_html
     "[<a href=\"https://github.com/spudtrooper/bookmarklets\">Source</a>]"
 )
-go run bookmarkletindex.go "${args[@]}" 2> /dev/null
+go run main.go "${args[@]}" 2> /dev/null
 
 echo "OK"
