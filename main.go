@@ -24,12 +24,23 @@ var (
 	headerHTMLFile   = flag.String("header_html_file", "", "file containing HTML to use as a header")
 	templateHTML     = flag.String("template_html", "", "HTML string to use as the main HTML template")
 	templateHTMLFile = flag.String("template_html_file", "", "file containing HTML to use as the main HTML template")
+	jsString         = flag.String("js_string", "", "JS as a string; when set we output the result to STDOUT")
 )
 
 func generateIndex() error {
 	if gitversion.CheckVersionFlag() {
 		return nil
 	}
+
+	if *jsString != "" {
+		output, err := bookmarkletgen.GenerateBookmarklet(*jsString)
+		if err != nil {
+			return errors.Errorf("GenerateBookmarklet: %v", err)
+		}
+		fmt.Printf("javascript:%s\n", output)
+		return nil
+	}
+
 	if *jsDir == "" {
 		return fmt.Errorf("js_dir required")
 	}

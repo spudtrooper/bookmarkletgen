@@ -10,6 +10,15 @@ import (
 	"github.com/yosssi/gohtml"
 )
 
+// GenerateBookmarklet generates a bookmarklet string from a JS string.
+func GenerateBookmarklet(jsString string) (string, error) {
+	minified, err := minifyAndFindFileMetadataFromString(jsString)
+	if err != nil {
+		return "", errors.Errorf("minifyAndFindFileMetadataFromString: %v", err)
+	}
+	return minified.js, nil
+}
+
 // GenerateIndexFiles generates bookmarklet index files for the given JS files.
 func GenerateIndexFiles(jsFiles []string, os ...Option) error {
 	opts := MakeOptions(os...)

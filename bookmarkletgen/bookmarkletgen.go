@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/js"
 )
@@ -21,11 +22,11 @@ type minifiedJS struct {
 	md fileMetadata
 }
 
-func findFileMetadata(f, js string) fileMetadata {
+func findFileMetadata(b []byte) fileMetadata {
 	var title string
 	var descr string
 	var image string
-	lines := strings.Split(js, "\n")
+	lines := strings.Split(string(b), "\n")
 	for _, s := range lines {
 		if m := titleRE.FindStringSubmatch(s); m != nil && len(m) == 2 {
 			title = strings.TrimSpace(m[1])
@@ -35,9 +36,6 @@ func findFileMetadata(f, js string) fileMetadata {
 			image = strings.TrimSpace(m[1])
 		}
 	}
-	if title == "" {
-		title = titleFromFileName(f)
-	}
 	res := fileMetadata{
 		title:       title,
 		description: descr,
@@ -46,11 +44,26 @@ func findFileMetadata(f, js string) fileMetadata {
 	return res
 }
 
-func minifyAndFindFileMetadata(f string) (*minifiedJS, error) {
+func minifyAndFindFileMetadataFromFile(f string) (*minifiedJS, error) {
 	b, err := ioutil.ReadFile(f)
 	if err != nil {
-		return nil, err
+		return nil, errors.Errorf("ReadFile(%q): %v", f, err)
 	}
+	res, err := minifyAndFindFileMetadataFromBytes(b)
+	if err != nil {
+		return nil, errors.Errorf("minifyAndFindFileMetadataFromBytes: %v", err)
+	}
+	if res.md.title == "" {
+		res.md.title = titleFromFileName(f)
+	}
+	return res, nil
+}
+
+func minifyAndFindFileMetadataFromString(jsString string) (*minifiedJS, error) {
+	return minifyAndFindFileMetadataFromBytes([]byte(jsString))
+}
+
+func minifyAndFindFileMetadataFromBytes(b []byte) (*minifiedJS, error) {
 	r := bytes.NewBuffer(b)
 	var w bytes.Buffer
 	m := minify.New()
@@ -59,7 +72,7 @@ func minifyAndFindFileMetadata(f string) (*minifiedJS, error) {
 		return nil, err
 	}
 	js := w.String()
-	md := findFileMetadata(f, string(b))
+	md := findFileMetadata(b)
 	res := &minifiedJS{
 		js: js,
 		md: md,
@@ -90,7 +103,7 @@ func titleFromFileName(f string) string {
 func inspectFiles(jsFiles []string, baseSourceURL string) ([]titledJS, error) {
 	var titledJSs []titledJS
 	for _, f := range jsFiles {
-		minified, err := minifyAndFindFileMetadata(f)
+		minified, err := minifyAndFindFileMetadataFromFile(f)
 		if err != nil {
 			return nil, err
 		}
