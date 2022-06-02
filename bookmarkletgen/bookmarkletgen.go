@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/spudtrooper/goutil/html"
 	"github.com/tdewolff/minify"
 	"github.com/tdewolff/minify/js"
 )
@@ -110,7 +111,7 @@ func inspectFiles(jsFiles []string, baseSourceURL string) ([]titledJS, error) {
 		js := minified.js
 		link := fmt.Sprintf(baseSourceURL+"/%s", path.Base(f))
 		title := minified.md.title
-		descr := minified.md.description
+		descr := html.Linkify(minified.md.description)
 		image := minified.md.image
 		t := titledJS{
 			Title:       title,
