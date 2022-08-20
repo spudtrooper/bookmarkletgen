@@ -102,6 +102,7 @@ func titleFromFileName(f string) string {
 }
 
 func inspectFiles(jsFiles []string, baseSourceURL string) ([]titledJS, error) {
+	hasSource := baseSourceURL != ""
 	var titledJSs []titledJS
 	for _, f := range jsFiles {
 		minified, err := minifyAndFindFileMetadataFromFile(f)
@@ -119,6 +120,7 @@ func inspectFiles(jsFiles []string, baseSourceURL string) ([]titledJS, error) {
 			Image:       image,
 			JS:          js,
 			Link:        link,
+			HasSource:   hasSource,
 		}
 		titledJSs = append(titledJSs, t)
 	}

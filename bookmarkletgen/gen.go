@@ -24,7 +24,11 @@ func genIndexHTML(titledJSs []titledJS, footerHTML, headerHTML, templateHTML str
 			<ul>
 			{{range $index, $p := .TitledJSs}}
 					<li>
-						<a href="javascript:{{$p.JS}}">{{$p.Title}}</a> (<a target="_" href="{{$p.Link}}">src</a>) - {{$p.Description}}
+						<a href="javascript:{{$p.JS}}">{{$p.Title}}</a>
+						{{if $p.HasSource }}
+							(<a target="_" href="{{$p.Link}}">src</a>)
+						{{end}}
+						- {{$p.Description}}
 						{{if $p.Image }}
 							[<a target="_" href="{{$p.Image}}">Context</a>]
 						{{end}}
@@ -61,6 +65,7 @@ func genIndexHTML(titledJSs []titledJS, footerHTML, headerHTML, templateHTML str
 	return out.Bytes(), nil
 }
 
+// TODO: Remove, markdown doesn't work.
 func genIndexMD(titledJSs []titledJS) ([]byte, error) {
 	tmpl, err := template.New("md").Parse(`
 # Bookmarklets
